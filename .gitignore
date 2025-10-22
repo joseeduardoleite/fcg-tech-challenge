@@ -1,0 +1,117 @@
+## Compiled source ##
+#####################
+bin/
+obj/
+out/
+[Bb]uild/
+[Bb]uild[Ll]og.*
+
+## User-specific files ##
+#########################
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+## Visual Studio ##
+###################
+.vs/
+.vscode/
+*.code-workspace
+
+## Visual Studio for Mac ##
+###########################
+*.userprefs
+.idea/
+
+## Rider ##
+###########
+.idea/
+*.sln.iml
+
+## Build results ##
+###################
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+
+## NuGet Packages ##
+####################
+*.nupkg
+*.snupkg
+# Ignore unpacked packages
+**/packages/*
+!**/packages/build/
+!**/packages/repositories.config
+
+## Dotnet tools ##
+##################
+*.dotnet-tools.json
+
+## Environment ##
+#################
+.env
+.env.*
+
+## Test results ##
+#################
+*.trx
+*.TestResults/
+TestResults/
+
+## Publish ##
+#############
+publish/
+*.pubxml
+*.publishproj
+
+## Coverage ##
+##############
+coverage/
+*.coverage
+*.coveragexml
+.coverage/
+
+## Temporary files ##
+#####################
+*.tmp
+*.temp
+*.bak
+*.log
+*.vspscc
+*.vssscc
+*.dbmdl
+
+## Secrets ##
+#############
+secrets.json
+appsettings.*.local.json
+appsettings.Development.json
+
+## OS-specific ##
+#################
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+## Others ##
+############
+*.sqlite
+*.db
+*.mdb
+*.pid
+*.lock
+*.swp
