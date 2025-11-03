@@ -10,13 +10,14 @@ namespace FiapCloudGames.Api.Utils;
 public sealed class ConfigureSwaggerOptions(IApiVersionDescriptionProvider provider) : IConfigureOptions<SwaggerGenOptions>
 {
     public void Configure(SwaggerGenOptions options)
-    {
-        foreach (var description in provider.ApiVersionDescriptions)
-            options.SwaggerDoc(description.GroupName,
-                new OpenApiInfo
+        => provider.ApiVersionDescriptions.ToList()
+            .ForEach(description => options.SwaggerDoc(
+                name: description.GroupName,
+                info: new OpenApiInfo
                 {
                     Title = $"FIAP Cloud Games API {description.ApiVersion}",
                     Version = description.ApiVersion.ToString(),
-                });
-    }
+                }
+            )
+        );
 }

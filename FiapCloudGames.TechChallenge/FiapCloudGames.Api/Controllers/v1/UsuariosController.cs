@@ -1,7 +1,6 @@
 using Asp.Versioning;
 using FiapCloudGames.Api.AppServices.v1.Interfaces;
 using FiapCloudGames.Application.Dtos;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FiapCloudGames.Api.Controllers.v1;
@@ -47,9 +46,10 @@ public sealed class UsuariosController(IUsuarioAppService usuarioAppService) : C
     {
         UsuarioDto usuarioCriado = await usuarioAppService.CriarUsuarioAsync(usuarioDto, cancellationToken);
 
-        return CreatedAtAction(
-            actionName: nameof(GetPorIdAsync),
-            routeValues: new { id = usuarioCriado.Id },
+        Console.Write(usuarioCriado.Id);
+
+        return Created(
+            uri: $"v1/usuarios/{usuarioCriado.Id}",
             value: usuarioCriado
         );
     }

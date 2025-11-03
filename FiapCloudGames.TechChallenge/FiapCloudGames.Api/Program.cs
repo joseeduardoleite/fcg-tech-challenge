@@ -29,22 +29,23 @@ builder.Services.AddApiVersioning(options =>
 });
 
 builder.Services.ConfigureOptions<ConfigureSwaggerOptions>();
+builder.Services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
 
 WebApplication app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
-    var provider = builder.Services.BuildServiceProvider().GetRequiredService<IApiVersionDescriptionProvider>();
+    var provider = app.Services.GetRequiredService<IApiVersionDescriptionProvider>();
 
     app.UseSwagger();
-    app.UseSwaggerUI(options =>
-    {
-        foreach (var description in provider.ApiVersionDescriptions)
-        {
-            options.SwaggerEndpoint($"/swagger/{description.GroupName}/swagger.json",
-                description.GroupName.ToUpperInvariant());
-        }
-    });
+    app.UseSwaggerUI(options => provider.ApiVersionDescriptions.ToList()
+        .ForEach(
+            description => options.SwaggerEndpoint(
+                url: $"/swagger/{description.GroupName}/swagger.json",
+                name: description.GroupName.ToUpperInvariant()
+            )
+        )
+    );
 }
 
 app.UseHttpsRedirection();
