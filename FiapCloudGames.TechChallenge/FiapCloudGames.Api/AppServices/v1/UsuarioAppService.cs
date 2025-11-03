@@ -22,6 +22,7 @@ public sealed class UsuarioAppService(
         string token = tokenService.GenerateToken(usuario.Id, usuario.Email!, usuario.Role.ToString()!);
 
         return new UsuarioTokenDto(
+            Id: usuario.Id,
             Email: usuario.Email,
             Role: usuario.Role.ToString(),
             Token: token

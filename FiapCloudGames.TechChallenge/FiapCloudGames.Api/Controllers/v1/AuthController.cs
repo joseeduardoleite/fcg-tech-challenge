@@ -1,8 +1,10 @@
 ﻿using Asp.Versioning;
 using FiapCloudGames.Api.AppServices.v1.Interfaces;
+using FiapCloudGames.Api.Examples;
 using FiapCloudGames.Application.Dtos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Filters;
 
 namespace FiapCloudGames.Api.Controllers.v1;
 
@@ -15,6 +17,7 @@ public sealed class AuthController(IUsuarioAppService usuarioAppService) : Contr
     [AllowAnonymous]
     [ProducesResponseType(typeof(UsuarioTokenDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [SwaggerRequestExample(typeof(UsuarioLoginDto), typeof(UsuarioLoginRequestExample))]
     public async Task<IActionResult> LoginAsync([FromBody] UsuarioLoginDto loginDto, CancellationToken cancellationToken)
     {
         try

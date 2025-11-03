@@ -1,7 +1,6 @@
 using Asp.Versioning;
 using FiapCloudGames.Api.AppServices.v1.Interfaces;
 using FiapCloudGames.Application.Dtos;
-using FiapCloudGames.Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -143,7 +142,7 @@ public sealed class UsuariosController(IUsuarioAppService usuarioAppService) : C
     }
 
     /// <summary>
-    /// Deleta um usuário
+    /// Deleta um usuário (Admins - Todos, Usuários - Sem permissão)
     /// </summary>
     /// <param name="id"></param>
     /// <param name="cancellationToken"></param>
