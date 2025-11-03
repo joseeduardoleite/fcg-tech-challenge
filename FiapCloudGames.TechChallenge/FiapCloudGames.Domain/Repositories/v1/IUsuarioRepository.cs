@@ -9,4 +9,5 @@ public interface IUsuarioRepository
     Task<Usuario> CriarUsuarioAsync(Usuario usuario, CancellationToken cancellationToken);
     Task<Usuario> EditarUsuarioAsync(Guid id, Usuario usuario, CancellationToken cancellationToken);
     Task DeletarUsuarioAsync(Guid id, CancellationToken cancellationToken);
+    Task<Usuario?> ObterUsuarioPorEmailAsync(string email, CancellationToken cancellationToken);
 }

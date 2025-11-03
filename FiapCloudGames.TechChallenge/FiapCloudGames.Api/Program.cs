@@ -4,17 +4,49 @@ using FiapCloudGames.Api;
 using FiapCloudGames.Api.Utils;
 using FiapCloudGames.Application;
 using FiapCloudGames.Infrastructure;
+using Microsoft.OpenApi.Models;
+using Swashbuckle.AspNetCore.Filters;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddApiModule();
 builder.Services.AddApplicationModule();
-builder.Services.AddInfraModule();
+builder.Services.AddInfraModule(builder.Configuration);
+
+builder.Services.AddAuthorization();
 
 builder.Services.AddControllers();
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+
+builder.Services.AddSwaggerGen(options =>
+{
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Description = "JWT Authorization header using the Bearer scheme. Exemplo: \"Bearer {token}\"",
+        Name = "Authorization",
+        In =ParameterLocation.Header,
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer"
+    });
+
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            []
+        }
+    });
+
+    options.ExampleFilters();
+});
 
 builder.Services.AddApiVersioning(options =>
 {
@@ -28,6 +60,7 @@ builder.Services.AddApiVersioning(options =>
     options.SubstituteApiVersionInUrl = true;
 });
 
+builder.Services.AddSwaggerExamplesFromAssemblyOf<Program>();
 builder.Services.ConfigureOptions<ConfigureSwaggerOptions>();
 builder.Services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
 
@@ -49,6 +82,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 

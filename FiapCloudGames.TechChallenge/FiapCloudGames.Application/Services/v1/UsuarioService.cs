@@ -12,6 +12,9 @@ public sealed class UsuarioService(IUsuarioRepository usuarioRepository) : IUsua
     public async Task<Usuario?> ObterUsuarioPorIdAsync(Guid id, CancellationToken cancellationToken)
         => !string.IsNullOrEmpty(id.ToString()) ? await usuarioRepository.ObterUsuarioPorIdAsync(id, cancellationToken) : null;
 
+    public async Task<Usuario?> ObterUsuarioPorEmailAsync(string email, CancellationToken cancellationToken)
+        => !string.IsNullOrEmpty(email) ? await usuarioRepository.ObterUsuarioPorEmailAsync(email, cancellationToken) : null;
+
     public async Task<Usuario> CriarUsuarioAsync(Usuario usuario, CancellationToken cancellationToken)
         => await usuarioRepository.CriarUsuarioAsync(usuario, cancellationToken);
 

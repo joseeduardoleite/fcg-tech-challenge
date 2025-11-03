@@ -17,24 +17,24 @@ public sealed class UsuarioRepository : IUsuarioRepository
         {
             new(
                 nome: "José",
-                email: "jose.fiap@gmail.com",
-                senha: "JoseFiap1234",
+                email: "jose.fgc@gmail.com",
+                senha: "Jose@1234",
                 role: Domain.Enums.ERole.Admin
             ),
             new(
                 nome: "Eduardo",
-                email: "eduardo.fiap@gmail.com",
-                senha: "EduardoFiap1234"
+                email: "eduardo.fgc@gmail.com",
+                senha: "Eduardo@1234"
             ),
             new(
                 nome: "João",
-                email: "joão.fiap@gmail.com",
-                senha: "JoaoFiap1234"
+                email: "joão.fgc@gmail.com",
+                senha: "Joao@1234"
             ),
             new(
                 nome: "Maria",
-                email: "maria.fiap@gmail.com",
-                senha: "MariaFiap1234"
+                email: "maria.fgc@gmail.com",
+                senha: "Maria@1234"
             )
         });
     }
@@ -44,6 +44,9 @@ public sealed class UsuarioRepository : IUsuarioRepository
 
     public async Task<Usuario?> ObterUsuarioPorIdAsync(Guid id, CancellationToken cancellationToken)
         => await Task.FromResult(_usuarios.FirstOrDefault(usuario => usuario.Id == id));
+
+    public async Task<Usuario?> ObterUsuarioPorEmailAsync(string email, CancellationToken cancellationToken)
+        => await Task.FromResult(_usuarios.FirstOrDefault(usuario => usuario.Email!.Equals(email, StringComparison.OrdinalIgnoreCase)));
 
     public async Task<Usuario> CriarUsuarioAsync(Usuario usuario, CancellationToken cancellationToken)
     {

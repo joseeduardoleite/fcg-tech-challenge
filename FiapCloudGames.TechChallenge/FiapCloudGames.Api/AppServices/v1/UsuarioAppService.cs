@@ -1,18 +1,41 @@
 ﻿using AutoMapper;
 using FiapCloudGames.Api.AppServices.v1.Interfaces;
 using FiapCloudGames.Application.Dtos;
+using FiapCloudGames.Application.Interfaces.Auth;
 using FiapCloudGames.Domain.Entities;
 using FiapCloudGames.Domain.Services.v1;
 
 namespace FiapCloudGames.Api.AppServices.v1;
 
-public sealed class UsuarioAppService(IUsuarioService usuarioService, IMapper mapper) : IUsuarioAppService
+public sealed class UsuarioAppService(
+    IUsuarioService usuarioService,
+    IMapper mapper,
+    ITokenService tokenService) : IUsuarioAppService
 {
-    public async Task<UsuarioDto> ObterPorIdAsync(Guid id, CancellationToken cancellationToken)
+    public async Task<UsuarioTokenDto> LoginAsync(UsuarioLoginDto loginDto, CancellationToken cancellationToken)
+    {
+        Usuario? usuario = await usuarioService.ObterUsuarioPorEmailAsync(loginDto.Email!, cancellationToken);
+
+        if (usuario is null || usuario.Senha != loginDto.Senha)
+            throw new UnauthorizedAccessException("Credenciais inválidas");
+
+        string token = tokenService.GenerateToken(usuario.Id, usuario.Email!, usuario.Role.ToString()!);
+
+        return new UsuarioTokenDto(
+            Email: usuario.Email,
+            Role: usuario.Role.ToString(),
+            Token: token
+        );
+    }
+
+    public async Task<IEnumerable<UsuarioDto>> ObterUsuarioAsync(CancellationToken cancellationToken)
+        => mapper.Map<IEnumerable<UsuarioDto>>(await usuarioService.ObterUsuariosAsync(cancellationToken));
+
+    public async Task<UsuarioDto> ObterUsuarioPorIdAsync(Guid id, CancellationToken cancellationToken)
         => mapper.Map<UsuarioDto>(await usuarioService.ObterUsuarioPorIdAsync(id, cancellationToken));
 
-    public async Task<IEnumerable<UsuarioDto>> ObterAsync(CancellationToken cancellationToken)
-        => mapper.Map<IEnumerable<UsuarioDto>>(await usuarioService.ObterUsuariosAsync(cancellationToken));
+    public async Task<UsuarioDto> ObterUsuarioPorEmailAsync(string email, CancellationToken cancellationToken)
+        => mapper.Map<UsuarioDto>(await usuarioService.ObterUsuarioPorEmailAsync(email, cancellationToken));
 
     public async Task<UsuarioDto> CriarUsuarioAsync(UsuarioDto usuarioDto, CancellationToken cancellationToken)
         => mapper.Map<UsuarioDto>(await usuarioService.CriarUsuarioAsync(mapper.Map<Usuario>(usuarioDto), cancellationToken));

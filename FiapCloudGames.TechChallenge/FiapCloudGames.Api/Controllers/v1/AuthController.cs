@@ -1,0 +1,31 @@
+﻿using Asp.Versioning;
+using FiapCloudGames.Api.AppServices.v1.Interfaces;
+using FiapCloudGames.Application.Dtos;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+
+namespace FiapCloudGames.Api.Controllers.v1;
+
+[ApiController]
+[ApiVersion("1.0")]
+[Route("v{version:apiVersion}/[controller]")]
+public sealed class AuthController(IUsuarioAppService usuarioAppService) : ControllerBase
+{
+    [HttpPost("[action]")]
+    [AllowAnonymous]
+    [ProducesResponseType(typeof(UsuarioTokenDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> LoginAsync([FromBody] UsuarioLoginDto loginDto, CancellationToken cancellationToken)
+    {
+        try
+        {
+            UsuarioTokenDto token = await usuarioAppService.LoginAsync(loginDto, cancellationToken);
+
+            return Ok(token);
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            return Unauthorized($"Erro inesperado: {ex.Message}");
+        }
+    }
+}
