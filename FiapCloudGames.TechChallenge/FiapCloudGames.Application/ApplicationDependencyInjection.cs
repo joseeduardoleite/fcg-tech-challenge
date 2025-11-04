@@ -12,10 +12,12 @@ public static class ApplicationDependencyInjection
     public static IServiceCollection AddApplicationModule(this IServiceCollection services)
     {
         services.AddScoped<IUsuarioService, UsuarioService>();
+        services.AddScoped<IJogoService, JogoService>();
 
         services.AddAutoMapper(mapperConfigurationExpression =>
         {
             mapperConfigurationExpression.AddProfile(typeof(UsuarioMapping));
+            mapperConfigurationExpression.AddProfile(typeof(JogoMapping));
         });
 
         return services;

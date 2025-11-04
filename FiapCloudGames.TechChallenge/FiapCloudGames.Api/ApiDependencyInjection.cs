@@ -10,6 +10,7 @@ public static class ApiDependencyInjection
     public static IServiceCollection AddApiModule(this IServiceCollection services)
     {
         services.AddScoped<IUsuarioAppService, UsuarioAppService>();
+        services.AddScoped<IJogoAppService, JogoAppService>();
 
         return services;
     }

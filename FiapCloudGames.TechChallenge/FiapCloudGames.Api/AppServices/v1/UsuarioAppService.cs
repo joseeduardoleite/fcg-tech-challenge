@@ -29,7 +29,7 @@ public sealed class UsuarioAppService(
         );
     }
 
-    public async Task<IEnumerable<UsuarioDto>> ObterUsuarioAsync(CancellationToken cancellationToken)
+    public async Task<IEnumerable<UsuarioDto>> ObterUsuariosAsync(CancellationToken cancellationToken)
         => mapper.Map<IEnumerable<UsuarioDto>>(await usuarioService.ObterUsuariosAsync(cancellationToken));
 
     public async Task<UsuarioDto> ObterUsuarioPorIdAsync(Guid id, CancellationToken cancellationToken)

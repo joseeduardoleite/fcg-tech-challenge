@@ -11,6 +11,7 @@ public sealed class DataSeederHostedService(ILogger<DataSeederHostedService> log
     public Task StartAsync(CancellationToken cancellationToken)
     {
         UsuarioRepository.Seed();
+        JogoRepository.Seed();
 
         logger.LogInformation("Dados iniciais populados com sucesso!");
 

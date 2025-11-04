@@ -3,22 +3,17 @@ using FiapCloudGames.Api.AppServices.v1.Interfaces;
 using FiapCloudGames.Application.Dtos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 
 namespace FiapCloudGames.Api.Controllers.v1;
 
+/// <summary>
+/// API responsável pelo controle de usuários
+/// </summary>
+/// <param name="usuarioAppService">Serviço de aplicação de usuários</param>
 [ApiController]
-[ApiVersion("1.0")]
+[ApiVersion("1")]
 [Route("v{version:apiVersion}/[controller]")]
-[Authorize]
-[ProducesResponseType(StatusCodes.Status200OK)]
-[ProducesResponseType(StatusCodes.Status201Created)]
-[ProducesResponseType(StatusCodes.Status204NoContent)]
-[ProducesResponseType(StatusCodes.Status401Unauthorized)]
-[ProducesResponseType(StatusCodes.Status403Forbidden)]
-[ProducesResponseType(StatusCodes.Status404NotFound)]
-[ProducesResponseType(StatusCodes.Status500InternalServerError)]
-public sealed class UsuariosController(IUsuarioAppService usuarioAppService) : ControllerBase
+public sealed class UsuariosController(IUsuarioAppService usuarioAppService) : FcgBaseController
 {
     /// <summary>
     /// Obtém todos os usuários (Admins - Todos, Usuários - Sem acesso)
@@ -34,14 +29,10 @@ public sealed class UsuariosController(IUsuarioAppService usuarioAppService) : C
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<ActionResult<IEnumerable<UsuarioDto>>> GetAsync(CancellationToken cancellationToken)
-    {
-        IEnumerable<UsuarioDto> usuarios = await usuarioAppService.ObterUsuarioAsync(cancellationToken);
-
-        return usuarios.Any() ? Ok(usuarios) : NoContent();
-    }
+        => ListResult(await usuarioAppService.ObterUsuariosAsync(cancellationToken));
 
     /// <summary>
-    /// Obtém usuário por id (Admins - Todos, Usuários - Somente o próprio)
+    /// Obtém um usuário por id (Admins - Todos, Usuários - Somente o próprio)
     /// </summary>
     /// <param name="id">Id do usuário</param>
     /// <param name="cancellationToken">Token para cancelamento da requisição</param>
@@ -57,20 +48,17 @@ public sealed class UsuariosController(IUsuarioAppService usuarioAppService) : C
     {
         UsuarioDto usuario = await usuarioAppService.ObterUsuarioPorIdAsync(id, cancellationToken);
 
-        string? role = User.FindFirst(c => c.Type == ClaimTypes.Role)?.Value;
-        string? userId = User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-
         if (usuario is null)
             return NotFound();
 
-        if (role != "Admin" && userId != usuario.Id.ToString())
+        if (!IsOwnerOrAdmin((Guid)usuario.Id!))
             return Forbid();
 
         return Ok(usuario);
     }
 
     /// <summary>
-    /// Obtém usuário por e-mail (Admins - Todos, Usuários - Somente o próprio)
+    /// Obtém um usuário por e-mail (Admins - Todos, Usuários - Somente o próprio)
     /// </summary>
     /// <param name="email">E-mail do usuário</param>
     /// <param name="cancellationToken">Token para cancelamento da requisição</param>
@@ -86,13 +74,10 @@ public sealed class UsuariosController(IUsuarioAppService usuarioAppService) : C
     {
         UsuarioDto usuario = await usuarioAppService.ObterUsuarioPorEmailAsync(email, cancellationToken);
 
-        string? role = User.FindFirst(c => c.Type == ClaimTypes.Role)?.Value;
-        string? userId = User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-
         if (usuario is null)
             return NotFound();
 
-        if (role != "Admin" && userId != usuario.Id.ToString())
+        if (!IsOwnerOrAdmin((Guid)usuario.Id!))
             return Forbid();
 
         return Ok(usuario);
@@ -101,9 +86,10 @@ public sealed class UsuariosController(IUsuarioAppService usuarioAppService) : C
     /// <summary>
     /// Cria um usuário (Admins - Podem criar, Usuários - Podem criar)
     /// </summary>
-    /// <param name="usuarioDto"></param>
-    /// <param name="cancellationToken"></param>
-    /// <returns></returns>
+    /// <param name="usuarioDto">Usuário a ser criado</param>
+    /// <param name="cancellationToken">Token para cancelamento da requisição</param>
+    /// <response code="201">Usuário criado com sucesso</response>
+    /// <returns>Usuário criado</returns>
     [HttpPost]
     [ProducesResponseType(typeof(UsuarioDto), StatusCodes.Status201Created)]
     public async Task<ActionResult<UsuarioDto>> CreateAsync([FromBody] UsuarioDto usuarioDto, CancellationToken cancellationToken)
@@ -130,10 +116,7 @@ public sealed class UsuariosController(IUsuarioAppService usuarioAppService) : C
     [ProducesResponseType(typeof(string), StatusCodes.Status403Forbidden)]
     public async Task<ActionResult<UsuarioDto>> UpdateAsync([FromRoute] Guid id, [FromBody] UsuarioDto usuarioDto, CancellationToken cancellationToken)
     {
-        string? role = User.FindFirst(c => c.Type == ClaimTypes.Role)?.Value;
-        string? userId = User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-
-        if (role != "Admin" && userId != id.ToString())
+        if (!IsOwnerOrAdmin((Guid)usuarioDto.Id!))
             return Forbid();
 
         UsuarioDto usuarioEditado = await usuarioAppService.EditarUsuarioAsync(id, usuarioDto, cancellationToken);
@@ -144,15 +127,15 @@ public sealed class UsuariosController(IUsuarioAppService usuarioAppService) : C
     /// <summary>
     /// Deleta um usuário (Admins - Todos, Usuários - Sem permissão)
     /// </summary>
-    /// <param name="id"></param>
-    /// <param name="cancellationToken"></param>
+    /// <param name="id">Id do usuário</param>
+    /// <param name="cancellationToken">Token para cancelamento da requisição</param>
     /// <response code="200">Usuário deletado com sucesso</response>
     /// <response code="403">Privilégios insuficientes</response>
-    /// <returns></returns>
+    /// <returns>Usuário deletado</returns>
     [HttpDelete("{id:guid}")]
     [Authorize(Roles = "Admin")]
     [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(string), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<ActionResult> DeleteAsync([FromRoute] Guid id, CancellationToken cancellationToken)
     {
         await usuarioAppService.DeletarUsuarioAsync(id, cancellationToken);

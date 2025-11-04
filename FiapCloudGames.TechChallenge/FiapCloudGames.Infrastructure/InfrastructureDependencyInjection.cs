@@ -18,6 +18,7 @@ public static class InfrastructureDependencyInjection
     public static IServiceCollection AddInfraModule(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddSingleton<IUsuarioRepository, UsuarioRepository>();
+        services.AddSingleton<IJogoRepository, JogoRepository>();
 
         services.AddHostedService<DataSeederHostedService>();
 

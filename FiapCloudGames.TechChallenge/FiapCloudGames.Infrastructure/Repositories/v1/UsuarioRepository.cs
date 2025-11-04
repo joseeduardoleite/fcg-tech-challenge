@@ -22,6 +22,12 @@ public sealed class UsuarioRepository : IUsuarioRepository
                 role: Domain.Enums.ERole.Admin
             ),
             new(
+                nome: "Admin",
+                email: "admin.fgc@gmail.com",
+                senha: "Admin@1234",
+                role: Domain.Enums.ERole.Admin
+            ),
+            new(
                 nome: "Eduardo",
                 email: "eduardo.fgc@gmail.com",
                 senha: "Eduardo@1234"
@@ -63,23 +69,19 @@ public sealed class UsuarioRepository : IUsuarioRepository
 
     public async Task<Usuario> EditarUsuarioAsync(Guid id, Usuario usuario, CancellationToken cancellationToken)
     {
-        Usuario? usuarioParaAtualizar = await ObterUsuarioPorIdAsync(id, cancellationToken);
+        Usuario? usuarioParaAtualizar = await ObterUsuarioPorIdAsync(id, cancellationToken)
+            ?? throw new KeyNotFoundException("Usuário não encontrado");
 
-        if (usuarioParaAtualizar is null)
-            throw new KeyNotFoundException("Usuário não encontrado");
-        else
-            usuarioParaAtualizar.Atualizar(usuario);
+        usuarioParaAtualizar.Atualizar(usuario);
 
-        return usuarioParaAtualizar;
+        return await Task.FromResult(usuarioParaAtualizar);
     }
 
     public async Task DeletarUsuarioAsync(Guid id, CancellationToken cancellationToken)
     {
-        Usuario? usuarioParaDeletar = await ObterUsuarioPorIdAsync(id, cancellationToken);
+        Usuario? usuarioParaDeletar = await ObterUsuarioPorIdAsync(id, cancellationToken)
+            ?? throw new KeyNotFoundException("Usuário não encontrado");
 
-        if (usuarioParaDeletar is null)
-            throw new KeyNotFoundException("Usuário não encontrado");
-        else
-            _usuarios.Remove(usuarioParaDeletar);
+        _usuarios.Remove(usuarioParaDeletar);
     }
 }

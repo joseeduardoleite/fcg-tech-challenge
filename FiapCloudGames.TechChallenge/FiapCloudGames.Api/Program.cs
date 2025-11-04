@@ -1,6 +1,7 @@
 using Asp.Versioning;
 using Asp.Versioning.ApiExplorer;
 using FiapCloudGames.Api;
+using FiapCloudGames.Api.Converters;
 using FiapCloudGames.Api.Utils;
 using FiapCloudGames.Application;
 using FiapCloudGames.Infrastructure;
@@ -15,7 +16,12 @@ builder.Services.AddInfraModule(builder.Configuration);
 
 builder.Services.AddAuthorization();
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(new DateConverter());
+        options.JsonSerializerOptions.Converters.Add(new RoleConverter());
+    });
 
 builder.Services.AddEndpointsApiExplorer();
 
