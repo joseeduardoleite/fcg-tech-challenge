@@ -17,7 +17,7 @@ namespace FiapCloudGames.Api.Controllers.v1;
 [ProducesResponseType(StatusCodes.Status403Forbidden)]
 [ProducesResponseType(StatusCodes.Status404NotFound)]
 [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-public sealed class JogosController(IJogoAppService jogoAppService) : FcgBaseController
+public sealed class JogosController(IJogoAppService jogoAppService) : FcgControllerBase
 {
     /// <summary>
     /// Obtém todos os jogos (Admins - Todos, Usuários - Todos)

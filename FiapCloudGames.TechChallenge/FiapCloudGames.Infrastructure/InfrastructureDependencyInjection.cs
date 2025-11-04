@@ -19,6 +19,7 @@ public static class InfrastructureDependencyInjection
     {
         services.AddSingleton<IUsuarioRepository, UsuarioRepository>();
         services.AddSingleton<IJogoRepository, JogoRepository>();
+        services.AddSingleton<IBibliotecaJogoRepository, BibliotecaJogoRepository>();
 
         services.AddHostedService<DataSeederHostedService>();
 

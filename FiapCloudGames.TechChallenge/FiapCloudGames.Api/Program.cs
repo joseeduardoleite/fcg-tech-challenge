@@ -2,9 +2,12 @@ using Asp.Versioning;
 using Asp.Versioning.ApiExplorer;
 using FiapCloudGames.Api;
 using FiapCloudGames.Api.Converters;
+using FiapCloudGames.Api.Extensions;
 using FiapCloudGames.Api.Utils;
 using FiapCloudGames.Application;
+using FiapCloudGames.Application.Validators;
 using FiapCloudGames.Infrastructure;
+using FluentValidation;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
 
@@ -22,6 +25,8 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.Converters.Add(new DateConverter());
         options.JsonSerializerOptions.Converters.Add(new RoleConverter());
     });
+
+builder.Services.AddValidatorsFromAssemblyContaining<UsuarioValidator>();
 
 builder.Services.AddEndpointsApiExplorer();
 
@@ -91,6 +96,10 @@ if (app.Environment.IsDevelopment())
         )
     );
 }
+
+app.UseErrorHandlingMiddleware();
+
+app.UseRequestLogging();
 
 app.UseHttpsRedirection();
 

@@ -2,7 +2,7 @@
 
 namespace FiapCloudGames.Domain.Entities;
 
-public sealed class Usuario
+public class Usuario
 {
     public Guid Id { get; set; }
     public string? Nome { get; set; }
@@ -11,6 +11,8 @@ public sealed class Usuario
     public ERole? Role { get; set; }
     public DateTime? CriadoEm { get; set; }
     public DateTime? AtualizadoEm { get; set; }
+
+    public virtual BibliotecaJogo Biblioteca { get; set; } = new();
 
     public Usuario() { }
 

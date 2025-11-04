@@ -32,7 +32,7 @@ namespace FiapCloudGames.Api;
 [ProducesResponseType(StatusCodes.Status404NotFound)]
 [ProducesResponseType(StatusCodes.Status500InternalServerError)]
 [ExcludeFromCodeCoverage]
-public abstract class FcgBaseController : ControllerBase
+public abstract class FcgControllerBase : ControllerBase
 {
     private static readonly JsonSerializerOptions jsonSerializerOptions = new()
     {

@@ -43,6 +43,8 @@ public sealed class UsuarioRepository : IUsuarioRepository
                 senha: "Maria@1234"
             )
         });
+
+        BibliotecaJogoRepository.Seed(_usuarios);
     }
 
     public async Task<IEnumerable<Usuario>> ObterUsuariosAsync(CancellationToken cancellationToken)

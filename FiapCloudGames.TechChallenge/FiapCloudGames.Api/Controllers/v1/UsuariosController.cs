@@ -13,7 +13,7 @@ namespace FiapCloudGames.Api.Controllers.v1;
 [ApiController]
 [ApiVersion("1")]
 [Route("v{version:apiVersion}/[controller]")]
-public sealed class UsuariosController(IUsuarioAppService usuarioAppService) : FcgBaseController
+public sealed class UsuariosController(IUsuarioAppService usuarioAppService) : FcgControllerBase
 {
     /// <summary>
     /// Obtém todos os usuários (Admins - Todos, Usuários - Sem acesso)

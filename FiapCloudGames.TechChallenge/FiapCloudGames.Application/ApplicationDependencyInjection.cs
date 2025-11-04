@@ -13,11 +13,13 @@ public static class ApplicationDependencyInjection
     {
         services.AddScoped<IUsuarioService, UsuarioService>();
         services.AddScoped<IJogoService, JogoService>();
+        services.AddScoped<IBibliotecaJogoService, BibliotecaJogoService>();
 
         services.AddAutoMapper(mapperConfigurationExpression =>
         {
             mapperConfigurationExpression.AddProfile(typeof(UsuarioMapping));
             mapperConfigurationExpression.AddProfile(typeof(JogoMapping));
+            mapperConfigurationExpression.AddProfile(typeof(BibliotecaJogoMapping));
         });
 
         return services;

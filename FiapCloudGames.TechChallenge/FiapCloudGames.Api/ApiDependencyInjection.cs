@@ -11,6 +11,7 @@ public static class ApiDependencyInjection
     {
         services.AddScoped<IUsuarioAppService, UsuarioAppService>();
         services.AddScoped<IJogoAppService, JogoAppService>();
+        services.AddScoped<IBibliotecaJogoAppService, BibliotecaJogoAppService>();
 
         return services;
     }
