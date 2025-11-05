@@ -1,6 +1,8 @@
 ﻿using Asp.Versioning;
 using FiapCloudGames.Api.AppServices.v1.Interfaces;
 using FiapCloudGames.Application.Dtos;
+using FluentValidation;
+using FluentValidation.Results;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,8 +14,8 @@ namespace FiapCloudGames.Api.Controllers.v1;
 /// <param name="bibliotecaJogoAppService">Serviço de aplicação de biblioteca de jogos</param>
 [ApiController]
 [ApiVersion("1")]
-[Route("v{version:apiVersion}/[controller]")]
-public sealed class BibliotecaJogosController(IBibliotecaJogoAppService bibliotecaJogoAppService) : FcgControllerBase
+[Route("v{version:apiVersion}/biblioteca-jogos")]
+public sealed class BibliotecaJogosController(IBibliotecaJogoAppService bibliotecaJogoAppService, IValidator<JogoDto> validator) : FcgControllerBase
 {
     /// <summary>
     /// Obtém todas as bibliotecas de jogos dos usuários (Admins - Todos, Usuários - Sem acesso)
@@ -92,13 +94,20 @@ public sealed class BibliotecaJogosController(IBibliotecaJogoAppService bibliote
     /// <param name="jogoDto">Jogo à ser adicionado</param>
     /// <param name="cancellationToken">Token para cancelamento da requisição</param>
     /// <response code="201">Jogo adicionado à biblioteca com sucesso</response>
+    /// <response code="400">Jogo inválido</response>
     /// <response code="403">Privilégios insuficientes</response>
     /// <returns>Jogo adicionado à biblioteca de jogos</returns>
     [HttpPost("{usuarioId:guid}")]
     [ProducesResponseType(typeof(BibliotecaJogoDto), StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<ActionResult<BibliotecaJogoDto>> AdicionarJogoAsync([FromRoute] Guid usuarioId, [FromBody] JogoDto jogoDto, CancellationToken cancellationToken)
     {
+        ValidationResult validationResult = await validator.ValidateAsync(jogoDto, cancellationToken);
+
+        if (!validationResult.IsValid)
+            return BadRequest(validationResult.Errors.Select(e => e.ErrorMessage));
+
         BibliotecaJogoDto bibliotecaDeJogos = await bibliotecaJogoAppService.AdicionarJogoABibliotecaDeJogosAsync(usuarioId, jogoDto, cancellationToken);
 
         if (!IsOwnerOrAdmin(bibliotecaDeJogos.UsuarioId))

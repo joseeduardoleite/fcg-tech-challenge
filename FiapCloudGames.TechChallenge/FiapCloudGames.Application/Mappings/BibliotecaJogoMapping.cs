@@ -10,5 +10,9 @@ public class BibliotecaJogoMapping : Profile
 {
     public BibliotecaJogoMapping()
         => CreateMap<BibliotecaJogo, BibliotecaJogoDto>()
+            .ForMember(
+                    dest => dest.UsuarioNome,
+                    opt => opt.MapFrom(src => src.Usuario.Nome)
+                )
             .ReverseMap();
 }

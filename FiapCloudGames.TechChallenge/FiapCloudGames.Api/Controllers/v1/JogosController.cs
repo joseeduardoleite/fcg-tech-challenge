@@ -1,6 +1,8 @@
 ﻿using Asp.Versioning;
 using FiapCloudGames.Api.AppServices.v1.Interfaces;
 using FiapCloudGames.Application.Dtos;
+using FluentValidation;
+using FluentValidation.Results;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,7 +19,7 @@ namespace FiapCloudGames.Api.Controllers.v1;
 [ProducesResponseType(StatusCodes.Status403Forbidden)]
 [ProducesResponseType(StatusCodes.Status404NotFound)]
 [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-public sealed class JogosController(IJogoAppService jogoAppService) : FcgControllerBase
+public sealed class JogosController(IJogoAppService jogoAppService, IValidator<JogoDto> validator) : FcgControllerBase
 {
     /// <summary>
     /// Obtém todos os jogos (Admins - Todos, Usuários - Todos)
@@ -80,14 +82,21 @@ public sealed class JogosController(IJogoAppService jogoAppService) : FcgControl
     /// <param name="jogoDto">Jogo a ser criado</param>
     /// <param name="cancellationToken">Token para cancelamento da requisição</param>
     /// <response code="201">Jogo criado com sucesso</response>
+    /// <response code="400">Jogo inválido</response>
     /// <response code="403">Privilégios insuficientes</response>
     /// <returns>Jogo criado</returns>
     [HttpPost]
     [Authorize(Roles = "Admin")]
     [ProducesResponseType(typeof(JogoDto), StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<ActionResult<JogoDto>> CreateAsync([FromBody] JogoDto jogoDto, CancellationToken cancellationToken)
     {
+        ValidationResult validationResult = await validator.ValidateAsync(jogoDto, cancellationToken);
+
+        if (!validationResult.IsValid)
+            return BadRequest(validationResult.Errors.Select(e => e.ErrorMessage));
+
         JogoDto jogoCriado = await jogoAppService.CriarJogoAsync(jogoDto, cancellationToken);
 
         return Created(

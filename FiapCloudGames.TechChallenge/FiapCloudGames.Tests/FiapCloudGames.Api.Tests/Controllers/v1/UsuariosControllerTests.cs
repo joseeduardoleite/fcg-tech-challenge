@@ -2,6 +2,8 @@
 using FiapCloudGames.Api.Controllers.v1;
 using FiapCloudGames.Application.Dtos;
 using FiapCloudGames.Domain.Enums;
+using FluentValidation;
+using FluentValidation.Results;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
@@ -16,10 +18,11 @@ public class UsuariosControllerTests
     private readonly UsuariosController _controller;
 
     private readonly Mock<IUsuarioAppService> _usuarioAppServiceMock = new();
+    private readonly Mock<IValidator<UsuarioDto>> _usuarioValidatorMock = new();
 
     public UsuariosControllerTests()
     {
-        _controller = new UsuariosController(_usuarioAppServiceMock.Object);
+        _controller = new UsuariosController(_usuarioAppServiceMock.Object, _usuarioValidatorMock.Object);
 
         ClaimsPrincipal user = new(new ClaimsIdentity(new Claim[]
         {
@@ -87,6 +90,9 @@ public class UsuariosControllerTests
         var usuarioDto = new UsuarioDto(null, "Eduardo", "eduardo@test.com", "Eduardo@1234", ERole.Usuario);
         var createdUsuario = new UsuarioDto(Guid.NewGuid(), "Francsico", "francisco@test.com", "Francisco@1234", ERole.Usuario);
 
+        _usuarioValidatorMock.Setup(v => v.ValidateAsync(It.IsAny<UsuarioDto>(), It.IsAny<CancellationToken>()))
+                          .ReturnsAsync(new ValidationResult());
+
         _usuarioAppServiceMock.Setup(s => s.CriarUsuarioAsync(usuarioDto, It.IsAny<CancellationToken>()))
                            .ReturnsAsync(createdUsuario);
 
@@ -104,7 +110,7 @@ public class UsuariosControllerTests
         var usuarioDto = new UsuarioDto(Guid.NewGuid(), "Eduardo", "eduardo@test.com", "Eduardo@1234", ERole.Usuario);
 
         // Simulando que o usuário logado não é dono nem admin
-        var controller = new UsuariosController(_usuarioAppServiceMock.Object)
+        var controller = new UsuariosController(_usuarioAppServiceMock.Object, _usuarioValidatorMock.Object)
         {
             ControllerContext = new ControllerContext
             {

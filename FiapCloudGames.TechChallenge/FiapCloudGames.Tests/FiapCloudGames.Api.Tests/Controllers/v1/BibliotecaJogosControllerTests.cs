@@ -2,6 +2,8 @@ using FiapCloudGames.Api.AppServices.v1.Interfaces;
 using FiapCloudGames.Api.Controllers.v1;
 using FiapCloudGames.Api.Tests.Extensions;
 using FiapCloudGames.Application.Dtos;
+using FluentValidation;
+using FluentValidation.Results;
 using Moq;
 using System.Diagnostics.CodeAnalysis;
 
@@ -13,9 +15,10 @@ public class BibliotecaJogosControllerTests
     private readonly BibliotecaJogosController _controller;
 
     private readonly Mock<IBibliotecaJogoAppService> _bibliotecaJogoAppServiceMock = new();
+    private readonly Mock<IValidator<JogoDto>> _jogoValidatorMock = new();
 
     public BibliotecaJogosControllerTests()
-        => _controller = new(_bibliotecaJogoAppServiceMock.Object);
+        => _controller = new(_bibliotecaJogoAppServiceMock.Object, _jogoValidatorMock.Object);
 
     [Fact]
     public async Task GetAsync_Admin_ReturnsAllBibliotecas()
@@ -70,6 +73,9 @@ public class BibliotecaJogosControllerTests
 
         var jogo = new JogoDto(jogoId, "Jogo X", DateTime.UtcNow, 199.9m);
         var biblioteca = new BibliotecaJogoDto(Guid.NewGuid(), usuarioId, "Eduardo", new List<JogoDto> { jogo });
+
+        _jogoValidatorMock.Setup(v => v.ValidateAsync(It.IsAny<JogoDto>(), It.IsAny<CancellationToken>()))
+                          .ReturnsAsync(new ValidationResult());
 
         _bibliotecaJogoAppServiceMock.Setup(s => s.AdicionarJogoABibliotecaDeJogosAsync(usuarioId, jogo, It.IsAny<CancellationToken>()))
                     .ReturnsAsync(biblioteca);

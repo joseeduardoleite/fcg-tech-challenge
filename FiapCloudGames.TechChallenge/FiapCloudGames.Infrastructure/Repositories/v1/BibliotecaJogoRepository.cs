@@ -19,6 +19,7 @@ public sealed class BibliotecaJogoRepository : IBibliotecaJogoRepository
             {
                 Id = Guid.NewGuid(),
                 UsuarioId = user.Id,
+                Usuario = user,
                 Jogos = new List<Jogo>()
             });
     }

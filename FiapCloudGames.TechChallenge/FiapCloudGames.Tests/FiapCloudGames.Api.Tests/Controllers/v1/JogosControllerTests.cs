@@ -2,6 +2,8 @@
 using FiapCloudGames.Api.Controllers.v1;
 using FiapCloudGames.Api.Tests.Extensions;
 using FiapCloudGames.Application.Dtos;
+using FluentValidation;
+using FluentValidation.Results;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using System.Diagnostics.CodeAnalysis;
@@ -16,10 +18,11 @@ public class JogosControllerTests
     private readonly JogosController _controller;
 
     private readonly Mock<IJogoAppService> _jogoServiceMock = new();
+    private readonly Mock<IValidator<JogoDto>> _jogoValidatorMock = new();
 
     public JogosControllerTests()
     {
-        _controller = new JogosController(_jogoServiceMock.Object);
+        _controller = new JogosController(_jogoServiceMock.Object, _jogoValidatorMock.Object);
 
         ClaimsPrincipal user = new(new ClaimsIdentity(new Claim[]
         {
@@ -156,6 +159,9 @@ public class JogosControllerTests
     {
         var jogoDto = new JogoDto(null, "Jogo novao em folha da massa", null, 99.9m);
         var jogoCriado = new JogoDto(Guid.NewGuid(), jogoDto.Nome, jogoDto.Lancamento, jogoDto.Preco);
+
+        _jogoValidatorMock.Setup(v => v.ValidateAsync(It.IsAny<JogoDto>(), It.IsAny<CancellationToken>()))
+                          .ReturnsAsync(new ValidationResult());
 
         _jogoServiceMock.Setup(s => s.CriarJogoAsync(jogoDto, It.IsAny<CancellationToken>()))
                         .ReturnsAsync(jogoCriado);

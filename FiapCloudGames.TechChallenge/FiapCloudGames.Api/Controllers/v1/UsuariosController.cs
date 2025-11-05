@@ -1,6 +1,8 @@
 using Asp.Versioning;
 using FiapCloudGames.Api.AppServices.v1.Interfaces;
 using FiapCloudGames.Application.Dtos;
+using FluentValidation;
+using FluentValidation.Results;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,7 +15,7 @@ namespace FiapCloudGames.Api.Controllers.v1;
 [ApiController]
 [ApiVersion("1")]
 [Route("v{version:apiVersion}/[controller]")]
-public sealed class UsuariosController(IUsuarioAppService usuarioAppService) : FcgControllerBase
+public sealed class UsuariosController(IUsuarioAppService usuarioAppService, IValidator<UsuarioDto> validator) : FcgControllerBase
 {
     /// <summary>
     /// Obtém todos os usuários (Admins - Todos, Usuários - Sem acesso)
@@ -89,11 +91,18 @@ public sealed class UsuariosController(IUsuarioAppService usuarioAppService) : F
     /// <param name="usuarioDto">Usuário a ser criado</param>
     /// <param name="cancellationToken">Token para cancelamento da requisição</param>
     /// <response code="201">Usuário criado com sucesso</response>
+    /// <response code="400">Usuário inválido</response>
     /// <returns>Usuário criado</returns>
     [HttpPost]
     [ProducesResponseType(typeof(UsuarioDto), StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<UsuarioDto>> CreateAsync([FromBody] UsuarioDto usuarioDto, CancellationToken cancellationToken)
     {
+        ValidationResult validationResult = await validator.ValidateAsync(usuarioDto, cancellationToken);
+
+        if (!validationResult.IsValid)
+            return BadRequest(validationResult.Errors.Select(e => e.ErrorMessage));
+
         UsuarioDto usuarioCriado = await usuarioAppService.CriarUsuarioAsync(usuarioDto, cancellationToken);
 
         return Created(
