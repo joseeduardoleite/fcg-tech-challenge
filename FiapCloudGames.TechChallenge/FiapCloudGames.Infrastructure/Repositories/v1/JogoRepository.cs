@@ -1,9 +1,11 @@
 ﻿using FiapCloudGames.Domain.Entities;
 using FiapCloudGames.Domain.Repositories.v1;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 
 namespace FiapCloudGames.Infrastructure.Repositories.v1;
 
+[ExcludeFromCodeCoverage]
 public sealed class JogoRepository : IJogoRepository
 {
     private static readonly List<Jogo> _jogos = [];

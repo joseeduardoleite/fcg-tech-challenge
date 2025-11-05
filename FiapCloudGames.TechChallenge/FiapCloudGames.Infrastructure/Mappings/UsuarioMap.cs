@@ -1,9 +1,11 @@
 ﻿using FiapCloudGames.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using System.Diagnostics.CodeAnalysis;
 
 namespace FiapCloudGames.Infrastructure.Mappings;
 
+[ExcludeFromCodeCoverage]
 public class UsuarioMap : IEntityTypeConfiguration<Usuario>
 {
     public void Configure(EntityTypeBuilder<Usuario> builder)

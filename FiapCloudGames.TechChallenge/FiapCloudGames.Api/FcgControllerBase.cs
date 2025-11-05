@@ -79,7 +79,7 @@ public abstract class FcgControllerBase : ControllerBase
     /// <summary>
     /// Verifica se o usuário autenticado é o proprietário (por Guid) ou Admin
     /// </summary>
-    protected bool IsOwnerOrAdmin(Guid resourceOwnerId)
+    internal bool IsOwnerOrAdmin(Guid resourceOwnerId)
     {
         var uid = GetUsuarioIdGuid();
         return (uid.HasValue && uid.Value == resourceOwnerId) || IsAdmin();
